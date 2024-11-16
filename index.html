@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Cart with User Input</title>
+    <script src="https://unpkg.com/intasend-inlinejs-sdk@4.0.5/build/intasend-inline.js"></script>
+    <style>
+        .cart {
+            border: 1px solid #ccc;
+            padding: 10px;
+            width: 300px;
+            margin-bottom: 20px;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .cart-item input {
+            width: 40px;
+            text-align: center;
+        }
+        .total {
+            font-weight: bold;
+            text-align: right;
+        }
+        .intaSendPayButton {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cart">
+        <div class="cart-item">
+            <span>Item 1</span>
+            <span>KES 50</span>
+            <input type="number" value="0" min="0" class="quantity">
+        </div>
+        <div class="cart-item">
+            <span>Item 2</span>
+            <span>KES 30</span>
+            <input type="number" value="0" min="0" class="quantity">
+        </div>
+        <div class="cart-item">
+            <span>Item 3</span>
+            <span>KES 20</span>
+            <input type="number" value="0" min="0" class="quantity">
+        </div>
+        <div class="total">
+            Total: <span id="totalAmount">KES 0</span>
+        </div>
+    </div>
+
+    <button class="intaSendPayButton" data-amount="0" data-currency="KES">Pay Now</button>
+
+    <script>
+
+new window.IntaSend({
+publicAPIKey: "Put Your Test API Key Here",
+live: false //set to true when going live
+})
+.on("COMPLETE", (results) => {console.log("Do something on success", results)})
+.on("FAILED", (results) => {console.log("Do something on failure", results)})
+.on("IN-PROGRESS", (results) => {console.log("Payment in progress status", results)})
+
+
+
+
+        // Function to update the total amount and set it to the button
+        function updateTotal() {
+            const items = document.querySelectorAll('.cart-item');
+            let total = 0;
+
+            items.forEach(item => {
+                const price = parseInt(item.querySelector('span:nth-child(2)').textContent.replace('KES ', ''));
+                const quantity = parseInt(item.querySelector('.quantity').value);
+                total += price * quantity;
+            });
+
+            document.getElementById('totalAmount').textContent = `KES ${total}`;
+            document.querySelector('.intaSendPayButton').setAttribute('data-amount', total);
+        }
+
+        // Add event listeners to quantity inputs
+        const quantityInputs = document.querySelectorAll('.quantity');
+        quantityInputs.forEach(input => {
+            input.addEventListener('input', updateTotal);
+        });
+
+        // Call the function to update the total on page load
+        updateTotal();
+    </script>
+
+</body>
+</html>
